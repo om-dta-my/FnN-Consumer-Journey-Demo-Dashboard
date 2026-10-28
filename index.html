@@ -52,89 +52,99 @@ th{color:var(--mu);font-weight:500;font-size:12px}
 .legend{display:flex;gap:14px;font-size:12px;color:var(--mu);margin-top:8px;flex-wrap:wrap}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}
 footer{margin-top:32px;font-size:12px;color:var(--mu);border-top:1px solid var(--bd);padding-top:12px}
 @media(max-width:640px){.st{grid-template-columns:1fr 90px}.st .bar{grid-column:1/-1;grid-row:2}.row{grid-template-columns:90px 1fr 56px}.meta{text-align:left}}
+
+.fl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:end;margin-top:14px}
+.fl label{font-size:12px;color:var(--mu);display:grid;gap:3px}
+select{font:14px Inter,sans-serif;padding:7px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--sf);color:var(--tx)}
+.tabs{display:flex;gap:4px;margin-top:14px;overflow-x:auto;border-bottom:1px solid var(--bd)}
+.tabs button{font:600 14px Inter,sans-serif;padding:10px 14px;border:0;border-bottom:3px solid transparent;background:none;color:var(--mu);cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected=true]{color:var(--tx);border-color:var(--red)}
+.tabs button:focus-visible,select:focus-visible{outline:3px solid var(--navy)}
+.k small{display:block;font-size:12px;margin-top:2px}
+svg.ln{width:100%;height:auto;display:block}
+.seg{display:flex;height:22px;border-radius:4px;overflow:hidden}.seg i{font:600 11px Inter;color:#fff;text-align:center;line-height:22px}
+td.c{text-align:center}
 </style></head><body><main>
-<header>
- <div><h1>F&amp;N consumer journey</h1>
- <p>Built on survey audiences and 2nd-party partner data, since F&amp;N has no registered-customer file. Layout follows the MJ CDP dashboards.</p></div>
- <div class="meta">Example brand: 100PLUS<br>Sources: Precision Growth Engine, LPD panel</div>
-</header>
-<div class="kpis" id="kpis"></div>
-
-<section>
- <h2>Where the audience data comes from</h2>
- <p class="sub">Three sources stand in for a customer database. Each answers a different question.</p>
- <div class="grid2" id="src"></div>
-</section>
-
-<section>
- <h2>The behaviour ladder</h2>
- <p class="sub">Each cohort has one growth job. Bars show the modelled universe and the part the plan reaches. Select a cohort for its detail.</p>
- <div class="funnel" id="funnel"></div>
- <div id="detail" aria-live="polite"></div>
-</section>
-
-<section>
- <h2>How each platform works the ladder</h2>
- <p class="sub">Weight combines the job to be done with cost per reach.</p>
- <div class="card" id="ch"></div>
-</section>
-
-<section>
- <h2>What to measure at each stage</h2>
- <p class="sub">Without sales records per person, the quarterly panel is the people result and MMM is the platform result. Values shown for four panel waves.</p>
- <div class="card wrap"><table id="tbl"></table></div>
-</section>
-
-<section>
- <h2>Panel movement across waves</h2>
- <p class="sub">Share of the panel in each drinking tier, and how people moved between tiers from wave 3 to wave 4.</p>
- <div class="grid2"><div class="card"><h3>Panel by drinking tier</h3><div id="wave"></div><div class="legend" id="wl"></div></div>
- <div class="card wrap"><h3>Movement, wave 3 to wave 4 (row %)</h3><table id="mov"></table></div></div>
-</section>
-
-<section>
- <h2>Loop and cadence</h2>
- <div class="grid2" id="loop"></div>
-</section>
-
-<section>
- <h2>What we need from F&amp;N</h2>
- <div class="ins" id="ins"></div>
-</section>
-
-<footer>Universe, reach and frequency figures are the modelled values from the Precision Growth Engine (OTS per week). Cohorts are modelled and may overlap.</footer>
+<header><div><h1>F&amp;N consumer journey</h1></div></header>
+<div class="fl">
+ <label>Brand<select id="fb"><option>100PLUS</option><option>Magnolia</option></select></label>
+ <label>From<select id="ff"></select></label>
+ <label>To<select id="ft"></select></label>
+</div>
+<div class="tabs" role="tablist" id="tabs"></div>
+<div id="view" style="margin-top:18px"></div>
 </main>
 <script>
 const $=id=>document.getElementById(id);
-$("src").innerHTML=[
-["Survey panel (LPD)","Bespoke research with 1,000 Malaysians seeds the cohorts. The same panel is re-interviewed each quarter.","Answers: who they are and how often they drink"],
-["2nd-party partners","Mobilewalla, Eyeota, AlikeAudience and Semasio on a Unified ID 2.0 spine turn survey cohorts into live IDs.","Answers: where to reach them"],
-["Sales and landing-page signals","SKU sales, Shopalyst landing-page clicks to Shopee, Lazada, TikTok Shop or the nearest store, and MMM.","Answers: what moved"]
-].map(s=>`<div class="card"><h3>${s[0]}</h3><p style="margin:0 0 8px;font-size:14px">${s[1]}</p><p class="sub" style="margin:0"><b>${s[2]}</b></p></div>`).join("");
+/* Replace this block with live feeds. One entry per quarterly wave. */
+const WL=["Q4 24","Q1 25","Q2 25","Q3 25","Q4 25","Q1 26","Q2 26","Q3 26"];
+const D={
+ tier:[[52,28,14,6],[50,28,15,7],[48,29,15,8],[46,30,16,8],[44,31,17,8],[43,31,18,8],[41,32,18,9],[40,32,19,9]],
+ matched:[520,575,640,700,760,820,890,961],
+ trial:[6.5,8,9,10.5,12,13.2,14.5,15.6],
+ match:[48,51,54,57,59,61,62,64],
+ ctr:[1.1,1.2,1.4,1.5,1.6,1.7,1.8,1.9],
+ mmm:[3.1,3.6,4.2,4.5,4.9,5.2,5.6,5.9],
+ visits:[38,44,52,58,66,74,83,92]};
 const C=[
-{n:"Recruit",s:"Malay and Gen Z non-buyers",a:591,u:2200,x:7,job:"Bring new drinkers in while protecting the base.",q:"Have you started drinking 100PLUS? When was your first purchase?",ch:"Meta and TikTok lead: reinforcement plus culture and discovery.",m:"Trial rate in the panel; landing-page clicks"},
-{n:"Light to medium",s:"Occasional drinkers",a:233,u:2240,x:3,job:"Add a purchase occasion.",q:"On which occasions do you drink it: sport, heat, Raya, breakfast?",ch:"YouTube storytelling for the occasion, display reminders near purchase.",m:"Occasions per drinker; drinking frequency"},
-{n:"Medium to more",s:"Regular drinkers",a:103,u:940,x:4,job:"Build a routine and habit.",q:"How many times a week do you drink it, and what do you drink instead?",ch:"Meta reinforcement and display reminders; creative rotated by moment.",m:"Weekly frequency; repeat purchase via landing page"},
-{n:"Heavy and defend",s:"Existing heavy buyers",a:34.2,u:690,x:2,job:"Protect existing buyers.",q:"Would you switch, and what would make you?",ch:"Light reminders and brand-health reinforcement; avoid overspend.",m:"Retention in the panel; share of requirement"}];
-const P=["71% Malay, 44% Gen Z. Top occasion: sport and after exercise.","58% Malay, 38% Gen Z. Top occasion: hot afternoons.","55% Malay, 31% Gen Z. Top occasion: with meals.","49% Malay, 24% Gen Z. Top occasion: daily at home."];
-const fn=$("funnel"),dt=$("detail");
-const k=v=>v>=1000?(v/1000).toFixed(2)+"M":v+"K";
-function show(i){[...fn.children].forEach((b,j)=>b.setAttribute("aria-pressed",j===i));const c=C[i];
-dt.innerHTML=`<div class="col"><b>Growth job</b><h3>${c.n}</h3><p>${c.job}</p></div><div class="col"><b>Survey question to ask</b><p>${c.q}</p></div><div class="col"><b>Media role</b><p>${c.ch}</p></div><div class="col"><b>Measured by</b><p>${c.m}</p></div><div class="col"><b>Profile</b><p>${P[i]}</p></div>`}
-C.forEach((c,i)=>{const b=document.createElement("button");b.className="st";b.setAttribute("aria-pressed","false");
-b.innerHTML=`<div class="n">${c.n}<small>${c.s}</small></div><div class="bar" style="position:relative"><i style="width:${c.u/2240*100}%;background:var(--g)"></i><i style="position:absolute;left:0;top:0;width:${c.a/2240*100}%;background:var(--navy)"></i></div><div class="v">${k(c.a)} of ${k(c.u)}<small>${c.x}X views per week</small></div>`;
-b.onclick=()=>show(i);fn.appendChild(b)});show(0);
-const ch=[["Meta","Reinforcement",1],["TikTok","Culture and discovery",1],["YouTube","Storytelling",.75],["Display","Reminders",.5]];
-$("ch").innerHTML=ch.map(r=>`<div class="row" style="grid-template-columns:90px 1fr 50px"><span><b>${r[0]}</b><br><small style="color:var(--mu)">${r[1]}</small></span><div class="bar"><i style="width:${r[2]*100}%;background:var(--red)"></i></div><em>${r[2].toFixed(2)}</em></div>`).join("");
-$("tbl").innerHTML="<tr><th>Stage</th><th>Panel measure</th><th>Wave 1</th><th>Wave 4</th><th>Change</th><th>MMM share of sales</th></tr>"+[["Recruit","Trial rate","9.0%","14.5%","+5.5 pts","7.5%"],["Light to medium","Occasions per drinker","1.4","1.9","+0.5","4.2%"],["Medium to more","Drinks per week","2.1","2.8","+0.7","5.1%"],["Heavy and defend","Retention","91%","93%","+2 pts","2.0%"]].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="pos">${r[4]}</td><td>${r[5]}</td></tr>`).join("");
-$("loop").innerHTML=[["Daily","Performance agents manage pacing, frequency and creative."],["Quarterly","MMM and the re-interviewed panel show what moved sales and brand KPIs."],["Every six months","Reset the portfolio, cohorts and budgets."],["Feedback","Sales, landing-page, panel and MMM signals re-prioritise the audiences."]].map(s=>`<div class="card"><h3>${s[0]}</h3><p style="margin:0;font-size:14px">${s[1]}</p></div>`).join("");
-$("ins").innerHTML=["<b>Sales and sell-out data.</b> Needed to tie the journey to volume, even without person-level records.","<b>Retailer access and the brand-health tracker.</b> Brand health feeds the quarterly measurement.","<b>One brief owner per brand and a shared clean room.</b> Keeps cohorts, frequency and budgets consistent across brands."].map(t=>`<div>${t}</div>`).join("");
-
-$("kpis").innerHTML=[["961K","Modelled reach across cohorts"],["62%","Partner ID match rate"],["14.5%","Trial rate, wave 4"],["57%","Panel now drinking"],["1.8%","Landing-page click rate"],["+4 pts","Medium and heavy tiers, W1 to W4"]].map(k=>`<div class="k"><b>${k[0]}</b><span>${k[1]}</span></div>`).join("");
-const T=["Non-drinker","Light","Medium","Heavy"],col=["var(--g)","var(--gold)","var(--navy)","var(--red)"];
-const W=[[52,28,14,6],[49,29,15,7],[46,30,16,8],[43,31,18,8]];
-$("wave").innerHTML=W.map((w,i)=>`<div class="row" style="grid-template-columns:50px 1fr"><span>Wave ${i+1}</span><div class="bar" style="display:flex;height:22px">${w.map((v,j)=>`<i style="width:${v}%;background:${col[j]};color:#fff;font:600 11px Inter;text-align:center;line-height:22px">${v}</i>`).join("")}</div></div>`).join("");
-$("wl").innerHTML=T.map((t,j)=>`<span><i style="background:${col[j]}"></i>${t}</span>`).join("");
+ {n:"Recruit",a:591,u:2200,x:7,race:[71,14,8,7],age:[44,31,16,9]},
+ {n:"Light to medium",a:233,u:2240,x:3,race:[58,24,10,8],age:[38,32,18,12]},
+ {n:"Medium to more",a:103,u:940,x:4,race:[55,26,11,8],age:[31,34,21,14]},
+ {n:"Heavy and defend",a:34.2,u:690,x:2,race:[49,30,12,9],age:[24,33,25,18]}];
+const PL=[["Meta","Reinforcement",1,1.1,1.1],["TikTok","Culture and discovery",1,1.3,1],["YouTube","Storytelling",.75,.8,.9],["Display","Reminders",.5,.6,.6]];
+const OCC=[["Sport and exercise",34],["Hot weather",29],["With meals",21],["Festive",9],["Breakfast",7]];
+const BR={"100PLUS":{v:1,r:1,n:0},"Magnolia":{v:.4,r:.85,n:8}};
+const col=["var(--g)","var(--gold)","var(--navy)","var(--red)"],TN=["Non-drinker","Light","Medium","Heavy"];
 const M=[[88,10,2,0],[6,78,15,1],[1,8,79,12],[0,2,12,86]];
-$("mov").innerHTML="<tr><th>From \\ to</th>"+T.map(t=>`<th>${t}</th>`).join("")+"</tr>"+M.map((r,i)=>`<tr><td>${T[i]}</td>${r.map((v,j)=>`<td style="${j>i?'background:rgba(19,128,111,'+(v/40)+')':j<i?'background:rgba(200,16,46,'+(v/40)+')':''}">${v}%</td>`).join("")}</tr>`).join("");
+const S={b:"100PLUS",f:0,t:7,tab:0};
+const f1=(v,d=1)=>(+v).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d});
+const kf=v=>v>=1000?f1(v/1000,2)+"M":f1(v,v<100?1:0)+"K";
+function tier(w){const b=BR[S.b],t=D.tier[w];if(!b.n)return t;const n=Math.min(t[0]+b.n,95),k=(100-n)/(100-t[0]);const o=t.slice(1).map(v=>Math.round(v*k));o[2]+=100-n-o.reduce((a,c)=>a+c,0);return[n,...o]}
+const rate=(a,w)=>D[a][w]*BR[S.b].r;
+const idx=()=>{const a=[];for(let i=S.f;i<=S.t;i++)a.push(i);return a};
+function line(vals,fmt){const w=600,h=170,p=28,mn=Math.min(...vals)*.95,mx=Math.max(...vals)*1.03;const pts=vals.map((v,i)=>[p+i*(w-2*p)/Math.max(vals.length-1,1),h-24-(v-mn)/(mx-mn||1)*(h-50)]);
+return `<svg class="ln" viewBox="0 0 ${w} ${h}"><polyline fill="none" stroke="var(--navy)" stroke-width="3" points="${pts.map(q=>q.join(",")).join(" ")}"/>${pts.map((q,i)=>`<circle cx="${q[0]}" cy="${q[1]}" r="4" fill="var(--navy)"/><text x="${q[0]}" y="${q[1]-9}" text-anchor="middle" font-size="11" fill="var(--tx)">${fmt(vals[i])}</text><text x="${q[0]}" y="${h-6}" text-anchor="middle" font-size="11" fill="var(--mu)">${WL[idx()[i]]}</text>`).join("")}</svg>`}
+const dl=(a,fmt,inv)=>{if(S.f==S.t)return"";const d=a[1]-a[0];const g=inv?d<0:d>0;return `<small class="${g?"pos":"neg"}">${d>0?"+":""}${fmt(d)} vs ${WL[S.f]}</small>`};
+const bar=(l,v,max,txt,c)=>`<div class="row"><span>${l}</span><div class="bar"><i style="width:${v/max*100}%;background:${c||"var(--navy)"}"></i></div><em>${txt}</em></div>`;
+const stack=a=>`<div class="seg">${a.map((v,j)=>`<i style="width:${v}%;background:${col[j]}">${v}</i>`).join("")}</div>`;
+const leg=`<div class="legend">${TN.map((t,j)=>`<span><i style="background:${col[j]}"></i>${t}</span>`).join("")}</div>`;
+const tabs=["Overview","Audience","Cohorts","Movements","Activation"];
+const V=[
+function(){const t=S.t,b=BR[S.b],f=S.f,cur=x=>x[t],K=[
+["Reached audience",kf(D.matched[t]*b.v),dl([D.matched[f]*b.v,D.matched[t]*b.v],v=>kf(Math.abs(v)).replace(/^/,v<0?"-":""))],
+["ID match rate",f1(rate("match",t),0)+"%",dl([rate("match",f),rate("match",t)],v=>f1(v,0)+" pts")],
+["Trial rate",f1(rate("trial",t))+"%",dl([rate("trial",f),rate("trial",t)],v=>f1(v)+" pts")],
+["Panel drinking",(100-tier(t)[0])+"%",dl([100-tier(f)[0],100-tier(t)[0]],v=>v+" pts")],
+["Landing click rate",f1(rate("ctr",t))+"%",dl([rate("ctr",f),rate("ctr",t)],v=>f1(v)+" pts")],
+["MMM share of sales",f1(rate("mmm",t))+"%",dl([rate("mmm",f),rate("mmm",t)],v=>f1(v)+" pts")]];
+const mx=2240*b.v;
+return `<div class="kpis" style="margin-top:0">${K.map(k=>`<div class="k"><b>${k[1]}</b><span>${k[0]}</span>${k[2]}</div>`).join("")}</div>
+<div class="grid2" style="margin-top:14px"><div class="card"><h3>Trial rate</h3>${line(idx().map(i=>rate("trial",i)),v=>f1(v)+"%")}</div><div class="card"><h3>Panel drinking</h3>${line(idx().map(i=>100-tier(i)[0]),v=>v+"%")}</div></div>
+<div class="card" style="margin-top:14px"><h3>Reach by cohort, ${WL[t]}</h3>${C.map(c=>{const r=c.a*D.matched[t]/961*b.v,u=c.u*b.v;return `<div class="row" style="grid-template-columns:130px 1fr 150px"><span>${c.n}</span><div class="bar" style="position:relative"><i style="width:${u/mx*100}%;background:var(--g)"></i><i style="position:absolute;left:0;top:0;width:${r/mx*100}%;background:var(--navy)"></i></div><em>${kf(r)} of ${kf(u)} · ${c.x}X</em></div>`}).join("")}<div class="legend"><span><i style="background:var(--g)"></i>Modelled universe</span><span><i style="background:var(--navy)"></i>Reached</span></div></div>`},
+function(){const L=["Malay","Chinese","Indian","Others"],A=["18-24","25-34","35-44","45+"];
+return `<div class="grid2"><div class="card wrap"><h3>Race by cohort (%)</h3><table><tr><th>Cohort</th>${L.map(x=>`<th>${x}</th>`).join("")}</tr>${C.map(c=>`<tr><td>${c.n}</td>${c.race.map(v=>`<td>${v}</td>`).join("")}</tr>`).join("")}</table></div>
+<div class="card wrap"><h3>Age by cohort (%)</h3><table><tr><th>Cohort</th>${A.map(x=>`<th>${x}${x=="18-24"?" (Gen Z)":""}</th>`).join("")}</tr>${C.map(c=>`<tr><td>${c.n}</td>${c.age.map(v=>`<td>${v}</td>`).join("")}</tr>`).join("")}</table></div></div>
+<div class="card" style="margin-top:14px"><h3>Drinking occasions (% of drinkers)</h3>${OCC.map(o=>bar(o[0],o[1],34,o[1]+"%","var(--teal)")).join("")}</div>`},
+function(){const rows=idx().map(i=>{const m=D.matched[i]*BR[S.b].v,p=i?D.matched[i-1]*BR[S.b].v:0,t=tier(i);return `<tr><td>${WL[i]}</td><td>${kf(m)}</td><td class="${p?"pos":""}">${p?f1((m/p-1)*100)+"%":""}</td>${t.map(v=>`<td>${v}%</td>`).join("")}</tr>`}).join("");
+return `<div class="card"><h3>Panel by drinking tier</h3>${idx().map(i=>`<div class="row" style="grid-template-columns:50px 1fr"><span>${WL[i]}</span>${stack(tier(i))}</div>`).join("")}${leg}</div>
+<div class="card wrap" style="margin-top:14px"><h3>Wave growth and tier mix</h3><table><tr><th>Wave</th><th>Reached</th><th>Growth</th>${TN.map(t=>`<th>${t}</th>`).join("")}</tr>${rows}</table></div>`},
+function(){const t=S.t;if(!t)return `<div class="card">Select a later end wave to see movement.</div>`;
+const sh=tier(t-1);const rows=[];for(let i=Math.max(S.f+1,1);i<=t;i++){const s=tier(i-1);let u=0,d=0;M.forEach((r,a)=>r.forEach((v,b)=>{if(b>a)u+=s[a]*v/100;if(b<a)d+=s[a]*v/100}));rows.push([WL[i-1]+" to "+WL[i],u,d])}
+return `<div class="grid2"><div class="card wrap"><h3>Movement, ${WL[t-1]} to ${WL[t]} (row %)</h3><table><tr><th>From \\ to</th>${TN.map(x=>`<th>${x}</th>`).join("")}<th>Panel share</th></tr>${M.map((r,i)=>`<tr><td>${TN[i]}</td>${r.map((v,j)=>`<td class="c" style="background:${j>i?"rgba(19,128,111,"+v/40+")":j<i?"rgba(200,16,46,"+v/40+")":"transparent"}">${v}%</td>`).join("")}<td>${sh[i]}%</td></tr>`).join("")}</table></div>
+<div class="card"><h3>Net movement of panel</h3>${rows.length?rows.map(r=>`<div style="font-size:13px;margin:8px 0"><div style="display:flex;justify-content:space-between"><span>${r[0]}</span><span><b class="pos">+${f1(r[1])}</b> up · <b class="neg">-${f1(r[2])}</b> down</span></div><div class="bar" style="height:8px;margin:3px 0"><i style="width:${r[1]*5}%;background:var(--teal)"></i></div><div class="bar" style="height:8px"><i style="width:${r[2]*5}%;background:var(--red)"></i></div></div>`).join(""):"Select a wider range."}</div></div>`},
+function(){const t=S.t,b=BR[S.b],tw=PL.reduce((a,p)=>a+p[2],0),tc=PL.reduce((a,p)=>a+p[2]*p[3],0),tm=PL.reduce((a,p)=>a+p[2]*p[4],0);
+const vis=idx().reduce((a,i)=>a+D.visits[i]*b.v,0);
+const rows=PL.map(p=>`<tr><td>${p[0]}</td><td>${p[1]}</td><td>${f1(p[2],2)}</td><td>${f1(p[2]/tw*100,0)}%</td><td>${f1(rate("ctr",t)*p[3]/(tc/tw))}%</td><td>${kf(vis*p[2]*p[3]/tc)}</td><td>${f1(rate("mmm",t)*p[2]*p[4]/tm)}%</td></tr>`).join("");
+const CO=[["Shopee",38],["Lazada",22],["TikTok Shop",18],["Nearest store",22]];
+return `<div class="card wrap"><h3>Platform performance, ${WL[S.f]} to ${WL[t]}</h3><table><tr><th>Platform</th><th>Role</th><th>Weight</th><th>Reach share</th><th>Click rate</th><th>Landing visits</th><th>MMM share of sales</th></tr>${rows}</table></div>
+<div class="grid2" style="margin-top:14px"><div class="card"><h3>Click-outs from landing page</h3>${CO.map(c=>bar(c[0],c[1],40,kf(vis*c[1]/100)+" · "+c[1]+"%","var(--red)")).join("")}</div>
+<div class="card"><h3>Landing visits by wave</h3>${line(idx().map(i=>D.visits[i]*b.v),v=>f1(v,0)+"K")}</div></div>`}];
+function draw(){$("view").innerHTML=V[S.tab]();[...$("tabs").children].forEach((b,i)=>b.setAttribute("aria-selected",i==S.tab))}
+$("tabs").innerHTML=tabs.map((t,i)=>`<button role="tab" data-i="${i}">${t}</button>`).join("");
+$("tabs").onclick=e=>{if(e.target.dataset.i){S.tab=+e.target.dataset.i;draw()}};
+const opts=WL.map((l,i)=>`<option value="${i}">${l}</option>`).join("");$("ff").innerHTML=opts;$("ft").innerHTML=opts;$("ff").value=0;$("ft").value=7;
+$("fb").onchange=e=>{S.b=e.target.value;draw()};
+$("ff").onchange=e=>{S.f=+e.target.value;if(S.f>S.t){S.t=S.f;$("ft").value=S.t}draw()};
+$("ft").onchange=e=>{S.t=+e.target.value;if(S.t<S.f){S.f=S.t;$("ff").value=S.f}draw()};
+draw();
 </script></body></html>
