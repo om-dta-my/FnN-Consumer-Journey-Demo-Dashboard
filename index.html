@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>F&amp;N Customer Journey Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f4f1;--sf:#fff;--tx:#1b1a1f;--mu:#6b6872;--bd:#e2ded8;--red:#c8102e;--navy:#0b3a6e;--gold:#e0a21b;--teal:#13806f;--g:#9a96a0;--sc:0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141318;--sf:#1e1d24;--tx:#f1eff3;--mu:#a29eaa;--bd:#33313b;--red:#ff4d63;--navy:#6aa6f0;--gold:#f0b83d;--teal:#3fc4ac;--g:#6e6a77}}
+:root[data-theme="dark"]{--bg:#141318;--sf:#1e1d24;--tx:#f1eff3;--mu:#a29eaa;--bd:#33313b;--red:#ff4d63;--navy:#6aa6f0;--gold:#f0b83d;--teal:#3fc4ac;--g:#6e6a77}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 Inter,system-ui,sans-serif}
+h1,h2,h3,.big{font-family:"Bricolage Grotesque",Inter,sans-serif;margin:0;letter-spacing:-.02em}
+main{max-width:1080px;margin:0 auto;padding:24px 16px 48px}
+header{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;align-items:end;border-bottom:3px solid var(--red);padding-bottom:14px}
+h1{font-size:clamp(28px,5vw,44px);font-weight:800;line-height:1.05}
+header p{margin:6px 0 0;color:var(--mu);max-width:56ch}
+.meta{font-size:12px;color:var(--mu);text-align:right}
+section{margin-top:28px}
+h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.sub{color:var(--mu);font-size:13px;margin:0 0 14px;max-width:70ch}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:18px}
+.k{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px 14px}
+.k b{display:block;font:800 24px "Bricolage Grotesque",sans-serif}
+.k span{font-size:12px;color:var(--mu)}
+.funnel{display:grid;gap:8px}
+.st{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:150px 1fr 110px;gap:12px;align-items:center;background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px 14px}
+.st:focus-visible{outline:3px solid var(--navy)}
+.st[aria-pressed=true]{border-color:var(--red);box-shadow:inset 4px 0 0 var(--red)}
+.st .n{font-weight:600}.st .n small{display:block;font-weight:400;color:var(--mu);font-size:12px}
+.bar{height:22px;background:var(--bd);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--navy);min-width:3px}
+.st .v{text-align:right;font:700 18px "Bricolage Grotesque",sans-serif}.st .v small{display:block;font:400 11px Inter;color:var(--mu)}
+.drop{font-size:12px;color:var(--red);padding-left:14px;margin:-2px 0}
+#detail{margin-top:12px;background:var(--sf);border:1px solid var(--bd);border-left:4px solid var(--red);border-radius:8px;padding:16px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+#detail h3{font-size:16px;margin-bottom:4px}#detail p{margin:0;font-size:14px;color:var(--mu)}
+#detail .col b{display:block;font-size:12px;color:var(--red);margin-bottom:2px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:16px}
+.card h3{font-size:15px;margin-bottom:10px}
+.row{display:grid;grid-template-columns:110px 1fr 64px;gap:8px;align-items:center;font-size:13px;margin:6px 0}
+.row .bar{height:14px}.row em{font-style:normal;text-align:right;font-weight:600}
+.wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:520px}
+th,td{padding:7px 8px;text-align:right;border-bottom:1px solid var(--bd)}th:first-child,td:first-child{text-align:left}
+th{color:var(--mu);font-weight:500;font-size:12px}
+.pos{color:var(--teal);font-weight:600}.neg{color:var(--red);font-weight:600}
+.ins{display:grid;gap:10px}
+.ins div{padding:12px 14px;border-left:4px solid var(--gold);background:var(--sf);border-radius:0 8px 8px 0;font-size:14px}
+.ins b{font-weight:600}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--mu);margin-top:8px;flex-wrap:wrap}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}
+footer{margin-top:32px;font-size:12px;color:var(--mu);border-top:1px solid var(--bd);padding-top:12px}
+@media(max-width:640px){.st{grid-template-columns:1fr 90px}.st .bar{grid-column:1/-1;grid-row:2}.row{grid-template-columns:90px 1fr 56px}.meta{text-align:left}}
+</style></head><body><main>
+<header>
+ <div><h1>F&amp;N consumer journey</h1>
+ <p>Built on survey audiences and 2nd-party partner data, since F&amp;N has no registered-customer file. Layout follows the MJ CDP dashboards.</p></div>
+ <div class="meta">Example brand: 100PLUS<br>Sources: Precision Growth Engine, LPD panel</div>
+</header>
+<div class="kpis" id="kpis"></div>
+
+<section>
+ <h2>Where the audience data comes from</h2>
+ <p class="sub">Three sources stand in for a customer database. Each answers a different question.</p>
+ <div class="grid2" id="src"></div>
+</section>
+
+<section>
+ <h2>The behaviour ladder</h2>
+ <p class="sub">Each cohort has one growth job. Bars show the modelled universe and the part the plan reaches. Select a cohort for its detail.</p>
+ <div class="funnel" id="funnel"></div>
+ <div id="detail" aria-live="polite"></div>
+</section>
+
+<section>
+ <h2>How each platform works the ladder</h2>
+ <p class="sub">Weight combines the job to be done with cost per reach.</p>
+ <div class="card" id="ch"></div>
+</section>
+
+<section>
+ <h2>What to measure at each stage</h2>
+ <p class="sub">Without sales records per person, the quarterly panel is the people result and MMM is the platform result. Values shown for four panel waves.</p>
+ <div class="card wrap"><table id="tbl"></table></div>
+</section>
+
+<section>
+ <h2>Panel movement across waves</h2>
+ <p class="sub">Share of the panel in each drinking tier, and how people moved between tiers from wave 3 to wave 4.</p>
+ <div class="grid2"><div class="card"><h3>Panel by drinking tier</h3><div id="wave"></div><div class="legend" id="wl"></div></div>
+ <div class="card wrap"><h3>Movement, wave 3 to wave 4 (row %)</h3><table id="mov"></table></div></div>
+</section>
+
+<section>
+ <h2>Loop and cadence</h2>
+ <div class="grid2" id="loop"></div>
+</section>
+
+<section>
+ <h2>What we need from F&amp;N</h2>
+ <div class="ins" id="ins"></div>
+</section>
+
+<footer>Universe, reach and frequency figures are the modelled values from the Precision Growth Engine (OTS per week). Cohorts are modelled and may overlap.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+$("src").innerHTML=[
+["Survey panel (LPD)","Bespoke research with 1,000 Malaysians seeds the cohorts. The same panel is re-interviewed each quarter.","Answers: who they are and how often they drink"],
+["2nd-party partners","Mobilewalla, Eyeota, AlikeAudience and Semasio on a Unified ID 2.0 spine turn survey cohorts into live IDs.","Answers: where to reach them"],
+["Sales and landing-page signals","SKU sales, Shopalyst landing-page clicks to Shopee, Lazada, TikTok Shop or the nearest store, and MMM.","Answers: what moved"]
+].map(s=>`<div class="card"><h3>${s[0]}</h3><p style="margin:0 0 8px;font-size:14px">${s[1]}</p><p class="sub" style="margin:0"><b>${s[2]}</b></p></div>`).join("");
+const C=[
+{n:"Recruit",s:"Malay and Gen Z non-buyers",a:591,u:2200,x:7,job:"Bring new drinkers in while protecting the base.",q:"Have you started drinking 100PLUS? When was your first purchase?",ch:"Meta and TikTok lead: reinforcement plus culture and discovery.",m:"Trial rate in the panel; landing-page clicks"},
+{n:"Light to medium",s:"Occasional drinkers",a:233,u:2240,x:3,job:"Add a purchase occasion.",q:"On which occasions do you drink it: sport, heat, Raya, breakfast?",ch:"YouTube storytelling for the occasion, display reminders near purchase.",m:"Occasions per drinker; drinking frequency"},
+{n:"Medium to more",s:"Regular drinkers",a:103,u:940,x:4,job:"Build a routine and habit.",q:"How many times a week do you drink it, and what do you drink instead?",ch:"Meta reinforcement and display reminders; creative rotated by moment.",m:"Weekly frequency; repeat purchase via landing page"},
+{n:"Heavy and defend",s:"Existing heavy buyers",a:34.2,u:690,x:2,job:"Protect existing buyers.",q:"Would you switch, and what would make you?",ch:"Light reminders and brand-health reinforcement; avoid overspend.",m:"Retention in the panel; share of requirement"}];
+const P=["71% Malay, 44% Gen Z. Top occasion: sport and after exercise.","58% Malay, 38% Gen Z. Top occasion: hot afternoons.","55% Malay, 31% Gen Z. Top occasion: with meals.","49% Malay, 24% Gen Z. Top occasion: daily at home."];
+const fn=$("funnel"),dt=$("detail");
+const k=v=>v>=1000?(v/1000).toFixed(2)+"M":v+"K";
+function show(i){[...fn.children].forEach((b,j)=>b.setAttribute("aria-pressed",j===i));const c=C[i];
+dt.innerHTML=`<div class="col"><b>Growth job</b><h3>${c.n}</h3><p>${c.job}</p></div><div class="col"><b>Survey question to ask</b><p>${c.q}</p></div><div class="col"><b>Media role</b><p>${c.ch}</p></div><div class="col"><b>Measured by</b><p>${c.m}</p></div><div class="col"><b>Profile</b><p>${P[i]}</p></div>`}
+C.forEach((c,i)=>{const b=document.createElement("button");b.className="st";b.setAttribute("aria-pressed","false");
+b.innerHTML=`<div class="n">${c.n}<small>${c.s}</small></div><div class="bar" style="position:relative"><i style="width:${c.u/2240*100}%;background:var(--g)"></i><i style="position:absolute;left:0;top:0;width:${c.a/2240*100}%;background:var(--navy)"></i></div><div class="v">${k(c.a)} of ${k(c.u)}<small>${c.x}X views per week</small></div>`;
+b.onclick=()=>show(i);fn.appendChild(b)});show(0);
+const ch=[["Meta","Reinforcement",1],["TikTok","Culture and discovery",1],["YouTube","Storytelling",.75],["Display","Reminders",.5]];
+$("ch").innerHTML=ch.map(r=>`<div class="row" style="grid-template-columns:90px 1fr 50px"><span><b>${r[0]}</b><br><small style="color:var(--mu)">${r[1]}</small></span><div class="bar"><i style="width:${r[2]*100}%;background:var(--red)"></i></div><em>${r[2].toFixed(2)}</em></div>`).join("");
+$("tbl").innerHTML="<tr><th>Stage</th><th>Panel measure</th><th>Wave 1</th><th>Wave 4</th><th>Change</th><th>MMM share of sales</th></tr>"+[["Recruit","Trial rate","9.0%","14.5%","+5.5 pts","7.5%"],["Light to medium","Occasions per drinker","1.4","1.9","+0.5","4.2%"],["Medium to more","Drinks per week","2.1","2.8","+0.7","5.1%"],["Heavy and defend","Retention","91%","93%","+2 pts","2.0%"]].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="pos">${r[4]}</td><td>${r[5]}</td></tr>`).join("");
+$("loop").innerHTML=[["Daily","Performance agents manage pacing, frequency and creative."],["Quarterly","MMM and the re-interviewed panel show what moved sales and brand KPIs."],["Every six months","Reset the portfolio, cohorts and budgets."],["Feedback","Sales, landing-page, panel and MMM signals re-prioritise the audiences."]].map(s=>`<div class="card"><h3>${s[0]}</h3><p style="margin:0;font-size:14px">${s[1]}</p></div>`).join("");
+$("ins").innerHTML=["<b>Sales and sell-out data.</b> Needed to tie the journey to volume, even without person-level records.","<b>Retailer access and the brand-health tracker.</b> Brand health feeds the quarterly measurement.","<b>One brief owner per brand and a shared clean room.</b> Keeps cohorts, frequency and budgets consistent across brands."].map(t=>`<div>${t}</div>`).join("");
+
+$("kpis").innerHTML=[["961K","Modelled reach across cohorts"],["62%","Partner ID match rate"],["14.5%","Trial rate, wave 4"],["57%","Panel now drinking"],["1.8%","Landing-page click rate"],["+4 pts","Medium and heavy tiers, W1 to W4"]].map(k=>`<div class="k"><b>${k[0]}</b><span>${k[1]}</span></div>`).join("");
+const T=["Non-drinker","Light","Medium","Heavy"],col=["var(--g)","var(--gold)","var(--navy)","var(--red)"];
+const W=[[52,28,14,6],[49,29,15,7],[46,30,16,8],[43,31,18,8]];
+$("wave").innerHTML=W.map((w,i)=>`<div class="row" style="grid-template-columns:50px 1fr"><span>Wave ${i+1}</span><div class="bar" style="display:flex;height:22px">${w.map((v,j)=>`<i style="width:${v}%;background:${col[j]};color:#fff;font:600 11px Inter;text-align:center;line-height:22px">${v}</i>`).join("")}</div></div>`).join("");
+$("wl").innerHTML=T.map((t,j)=>`<span><i style="background:${col[j]}"></i>${t}</span>`).join("");
+const M=[[88,10,2,0],[6,78,15,1],[1,8,79,12],[0,2,12,86]];
+$("mov").innerHTML="<tr><th>From \\ to</th>"+T.map(t=>`<th>${t}</th>`).join("")+"</tr>"+M.map((r,i)=>`<tr><td>${T[i]}</td>${r.map((v,j)=>`<td style="${j>i?'background:rgba(19,128,111,'+(v/40)+')':j<i?'background:rgba(200,16,46,'+(v/40)+')':''}">${v}%</td>`).join("")}</tr>`).join("");
+</script></body></html>
